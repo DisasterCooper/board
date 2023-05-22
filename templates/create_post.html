@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a note</title>
+</head>
+<body>
+
+    <div>
+        {% for error in errors %}
+
+            <p style="background-color: #81a84b; color: #9b2d78; padding: 14px; border-radius: 10px">
+                {{ error }}
+            </p>
+
+         {% endfor %}
+    </div>
+
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div>
+            <label>
+                Заголовок
+                <input name="title">
+            </label>
+        </div>
+
+        <div>
+            <label>
+                Содержимое
+                <textarea name="text"></textarea>
+            </label>
+        </div>
+
+        <input type="submit" value="Отправить">
+
+    </form>
+
+
+</body>
+</html>

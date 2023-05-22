@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Deleting</title>
+
+</head>
+<body>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <p class="danger-block">Delete "{{ post.id }}"?</p>
+
+        <div>
+            <button type="submit">Delete</button>
+            <a href="/post/<int:post_id>/delete/"></a>
+        </div>
+
+    </form>
+
+</body>
+</html>
