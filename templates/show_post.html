@@ -21,10 +21,12 @@
     </div>
 
     <div>
-        <button type="submit">Edit</button>
-        <a href="/post/<int:post_id>/edit/"></a>
+        <a href="{% url "post_edit" post.id %}">
+            <button type="submit">Edit</button>
+        </a>
+        <a href="{% url "post_delete" post.id %}">
         <button type="submit">Delete</button>
-        <a href="/post/<int:post_id>/delete/"></a>
+        </a>
     </div>
 
 </body>

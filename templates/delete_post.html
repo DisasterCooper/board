@@ -12,11 +12,12 @@
 
         {% csrf_token %}
 
-        <p class="danger-block">Delete "{{ post.id }}"?</p>
+        <p class="danger-block">Delete "{{ post.title }}"?</p>
 
         <div>
-            <button type="submit">Delete</button>
-            <a href="/post/<int:post_id>/delete/"></a>
+        <a href="{% url "post_delete" post.id %}">
+        <button type="submit">Delete</button>
+        </a>
         </div>
 
     </form>

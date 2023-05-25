@@ -40,7 +40,7 @@ def create_post(request):
             post = Post(title=title, content=content)
             post.save()
 
-            return redirect("/")
+            return redirect(reverse("post_show", kwargs={"post_id": post.id}))
 
     return render(request, "create_post.html", {"errors": errors})
 
@@ -68,13 +68,17 @@ def edit_post(request, post_id: int):
         else:
             post.save()
 
-        return redirect(reverse("post_show", kwargs={"post_show": post_id}))
+        return redirect(reverse("post_show", kwargs={"post_id": post_id}))
 
     return render(request, "edit_post.html", {"errors": errors, "post": post})
 
 
 def delete_post(request, post_id: int):
     post = get_object_or_404(Post, id=post_id)
-    post.delete()
+
+    if request.method == "POST":
+        post.delete()
+
+        return redirect(reverse("home"))
 
     return render(request, "delete_post.html", {"post": post})
