@@ -1,22 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Create a note</title>
-</head>
-<body>
+{% extends "todolist/base_todolist.html" %}
 
-    <div>
+{% block content %}
+
+<div>
         {% for error in errors %}
 
-            <p style="background-color: #dfcfe3; color: #c93c3c; padding: 14px; border-radius: 20px">
+            <p style="background-color: #d9696a; color: white; padding: 10px; border-radius: 10px">
                 {{ error }}
             </p>
 
-         {% endfor %}
+        {% endfor %}
     </div>
-
-
 
     <form method="post">
 
@@ -25,14 +19,14 @@
         <div>
             <label>
                 Заголовок
-                <input name="title">
+                <input name="title" value="{{ post.title }}">
             </label>
         </div>
 
         <div>
             <label>
                 Содержимое
-                <textarea name="text"></textarea>
+                <textarea name="text">{{ post.content }}</textarea>
             </label>
         </div>
 
@@ -40,6 +34,4 @@
 
     </form>
 
-
-</body>
-</html>
+{% endblock %}

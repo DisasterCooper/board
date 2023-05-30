@@ -1,0 +1,31 @@
+{% extends "todolist/base_todolist.html" %}
+
+{% block content %}
+<div class="container my-2">
+         <div class="p-5 text-center bg-body-tertiary rounded-3">
+                <h1 class="text-body-emphasis">TODOLIST</h1>
+                <p class="col-lg-8 mx-auto fs-5 text-muted">
+                  Manage your task list.
+                </p>
+                <div class="d-inline-flex gap-2 mb-4">
+{#                  <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">#}
+                  <a href="{% url "post_create" %}" class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill">
+                    Create task
+                   </a>
+                </div>
+         </div>
+</div>
+
+<div class="container">
+
+    {% for post in posts %}
+
+            <div class="col-lg-4">
+                <h2 class="fw-normal">{{ post.title }}</h2>
+                <p>{{ post.content }}</p>
+                <a class="btn btn-secondary btn-sm" href="{% url "post_edit" post.id %}">Edit</a>
+                <a class="btn btn-primary btn-sm" href="{% url "post_show" post.id %}">Watch</a>
+            </div>
+    {% endfor %}
+</div>
+{% endblock %}

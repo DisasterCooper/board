@@ -1,0 +1,37 @@
+{% extends "todolist/base_todolist.html" %}
+
+{% block content %}
+
+<div class="container w-50">
+    <div>
+        {% for error in errors %}
+
+            <p style="background-color: #dfcfe3; color: #c93c3c; padding: 14px; border-radius: 20px">
+                {{ error }}
+            </p>
+
+         {% endfor %}
+    </div>
+
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="note-title" class="form-label">Note`s name</label>
+            <input type="text" name="title" class="form-control" id="exampleFormControlInput1" placeholder="Name">
+        </div>
+        <div class="mb-3">
+            <label for="note-content" class="note-title">Note`s content</label>
+            <textarea class="form-control" name="content" id="note-content" rows="3"></textarea>
+        </div>
+
+        <button class="btn btn-primary" type="submit">Create</button>
+
+    </form>
+
+</div>
+
+{% endblock %}
