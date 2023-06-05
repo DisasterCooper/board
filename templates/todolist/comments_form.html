@@ -1,0 +1,20 @@
+<form action="{% url "posts:comment_add" post_id %}" method="post">
+
+    {% csrf_token %}
+
+        <div class="mb-md-1">
+            <label for="username-id" class="form-label">Username</label>
+            <input type="text" required name="user" class="form-control" id="username-id">
+        </div>
+        <div class="mb-md-1">
+            <label for="email-id" class="form-label">Email</label>
+            <input type="email" required name="email" class="form-control" id="email-id">
+        </div>
+        <div class="mb-md-1">
+            <label for="comment-id" class="form-label">Comment</label>
+            <textarea class="form-control" required name="content" id="comment-id"></textarea>
+        </div>
+
+    <button type="submit" class="btn btn-warning">Send</button>
+
+</form>

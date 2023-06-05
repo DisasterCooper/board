@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from todolist.views_class import PostsList
 
 urlpatterns = [
+    path('', PostsList.as_view()),
     path('admin/', admin.site.urls),
     path('post1/', include('todolist.urls_func')),
-    path('post/', include('todolist.urls_class')),
+    path('posts/', include(('todolist.urls_class', 'posts'), namespace='posts')),
+    path('accounts/', include(('django.contrib.auth.urls', 'auth'), namespace='accounts'))
 ]

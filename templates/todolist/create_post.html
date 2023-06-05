@@ -13,20 +13,47 @@
          {% endfor %}
     </div>
 
-
-
     <form method="post">
 
         {% csrf_token %}
 
         <div class="mb-3">
-            <label for="note-title" class="form-label">Note`s name</label>
-            <input type="text" name="title" class="form-control" id="exampleFormControlInput1" placeholder="Name">
+            <div class="input-group has-validation">
+                <div class="form-floating {% if validator and not validator.title.is_valid %} is-invalid {% endif %}">
+
+                    <input type="text" name="title" class="form-control
+                        {% if validator and not validator.title.is_valid %} is-invalid {% endif %}" id="note-title">
+                    <label for="note-title" class="form-label">Note`s name</label>
+                </div>
+
+            {% if validator and not validator.title.is_valid %}
+                <div class="invalid-feedback">
+                    {% for error in validator.title.errors %}
+                        <p> {{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            </div>
         </div>
+
         <div class="mb-3">
-            <label for="note-content" class="note-title">Note`s content</label>
-            <textarea class="form-control" name="content" id="note-content" rows="3"></textarea>
-        </div>
+            <div class="input-group has-validation">
+                <div class="form-floating {% if validator and not validator.content.is_valid %} is-invalid {% endif %}">
+                    <textarea class="form-control" {% if validator and not validator.content.is_valid %} is-invalid {% endif %}
+                                name="content" id="note-content" rows="3">
+                    </textarea>
+                    <label for="note-content" class="form-label">Note`s content</label>
+                </div>
+
+                {% if validator and not validator.content.is_valid %}
+                    <div class="invalid-feedback">
+                        {% for error in validator.content.errors %}
+                            <p> {{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </div>
 
         <button class="btn btn-primary" type="submit">Create</button>
 

@@ -1,0 +1,14 @@
+    <div class="list-group">
+
+        {% for comment in comments %}
+
+            <a href="#" class="list-group-item list-group-item-action d-flex gap-3" aria-current="true">
+                <h6 class="mb-auto">
+                    {{ comment.username }} - {{ comment.email }}
+                    <p class="mb-0 opacity-75">{{ comment.content }}</p>
+                </h6>
+                <small class="opacity-50 text nowrap">{{ comment.created }}</small>
+            </a>
+
+        {% endfor %}
+    </div>
