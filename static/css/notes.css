@@ -1,0 +1,14 @@
+.main_style{
+    border-radius: 20px 10px;
+    border: 2px #a67e41;
+    margin: 10px;
+    padding: 30px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.title_note{
+    border-radius: 30px;
+    margin: 30px;
+    text-align: justify;
+    font-style: italic ;
+}

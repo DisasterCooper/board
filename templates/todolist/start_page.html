@@ -1,0 +1,16 @@
+<div class="container my-2">
+    <div class="p-5 text-center bg-body-tertiary rounded-3">
+        <h1 class="text-body-emphasis">TODOLIST</h1>
+            <p class="fs-5 col-md-8">
+              Manage your task list.
+            </p>
+        <div class="mb-5">
+
+            {% if request.user.is_authentificated %}
+              <a href="{% url "posts:create" %}" class="btn btn-primary btn-lg px-4">
+                  Create task
+               </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

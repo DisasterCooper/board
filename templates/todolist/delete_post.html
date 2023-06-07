@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "todolist/base_todolist.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Deleting</title>
-
-</head>
-<body>
+{% block content %}
+<div>
 
     <form method="post">
 
@@ -15,12 +10,12 @@
         <p class="danger-block">Delete "{{ post.title }}"?</p>
 
         <div>
-        <a href="{% url "post_delete" post.id %}">
+        <a href="{% url "posts:delete" post.id %}">
         <button type="submit">Delete</button>
         </a>
         </div>
 
     </form>
 
-</body>
-</html>
+</div>
+{% endblock %}
