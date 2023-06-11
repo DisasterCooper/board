@@ -15,7 +15,7 @@ class PostsList(generic.View):
     def get_queryset():
         """
         Формирует 'QuerySet' всех заметок и возвращает поля id, title, created,
-        имя пользователя, создавшего заметку и комментарии к ней.
+        имя пользователя, создавшего заметку и количество комментариев к этой заметке.
         :return: Если values => возвращается 'QuerySet' словарей!
         """
         return Post.objects.all()\
@@ -144,6 +144,7 @@ class ShowPost(generic.DetailView):
     pk_url_kwarg = "post_id"  # Где взять id объекта в URL?
     template_name = "todolist/show_post.html"  # Шаблон, куда вернуть
     context_object_name = "post"  # Под каким именем вернуть в этот шаблон
+    image = "img/img.png"  # !! Добавить для TODOLIST фоновую картинку (или удалить строку эту)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -202,3 +203,19 @@ class CommentAdd(generic.View):
             post=post,
         )
         return redirect(reverse("posts:show", kwargs={"post_id": post.id}))
+
+
+class ProfileUsers(generic.View):
+    queryset = Post.objects  # Откуда вытянуть
+    pk_url_kwarg = "post_id"  # Где взять id объекта в URL?
+    template_name = "todolist/profile_users.html"  # Шаблон, куда вернуть
+    context_object_name = "post"  # Под каким именем вернуть в этот шаблон
+
+    @staticmethod
+    def get_queryset():
+        return Post.objects.all() \
+            .select_related("user") \
+            .annotate(Count("comments")) \
+            .values("id", "title", "created", "user__username", "comments__count") \
+            .order_by("-comments__count")
+
