@@ -3,8 +3,8 @@
         <div class="d-flex justify-content-center py-3">
             <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="{% url 'posts:home' %}" class="nav-link px-2">Home</a></li>
-                <li><a href="#" class="nav-link px-2">About</a></li>
-                <li><a class="btn btn-success bs-tooltip-bottom" href="#">Profile</a></li>
+                <li><a class="btn btn-success bs-tooltip-bottom" href="{% url 'posts:users' %}">Profile</a></li>
+                <li><a class="btn btn-warning" href="{% url 'posts:top_posts' %}" >Top-Posts</a></li>
 
                 {% if request.user.is_authenticated %}
 

@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.http import HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
@@ -7,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count, Avg, Min, Max
 
 from .models import Post, Comment
+from user.models import User as usermodel
 
 
 class PostsList(generic.View):
@@ -18,10 +21,10 @@ class PostsList(generic.View):
         имя пользователя, создавшего заметку и количество комментариев к этой заметке.
         :return: Если values => возвращается 'QuerySet' словарей!
         """
-        return Post.objects.all()\
-            .select_related("user")\
-            .annotate(Count("comments"))\
-            .values("id", "title", "created", "user__username", "comments__count")\
+        return Post.objects.all() \
+            .select_related("user") \
+            .annotate(Count("comments")) \
+            .values("id", "title", "created", "user__username", "comments__count") \
             .order_by("-comments__count")
 
     def get(self, request):
@@ -206,10 +209,10 @@ class CommentAdd(generic.View):
 
 
 class ProfileUsers(generic.View):
-    queryset = Post.objects  # Откуда вытянуть
-    pk_url_kwarg = "post_id"  # Где взять id объекта в URL?
-    template_name = "todolist/profile_users.html"  # Шаблон, куда вернуть
-    context_object_name = "post"  # Под каким именем вернуть в этот шаблон
+    # queryset = Post.objects  # Откуда вытянуть
+    # pk_url_kwarg = "post_id"  # Где взять id объекта в URL?
+    # template_name = "todolist/profile_users.html"  # Шаблон, куда вернуть
+    # context_object_name = "post"  # Под каким именем вернуть в этот шаблон
 
     @staticmethod
     def get_queryset():
@@ -219,3 +222,22 @@ class ProfileUsers(generic.View):
             .values("id", "title", "created", "user__username", "comments__count") \
             .order_by("-comments__count")
 
+    def get(self, request):
+        posts = self.get_queryset()
+        return render(request, "todolist/profile_users.html", {"posts": posts})
+
+
+class TopPosts(generic.View):
+
+    @staticmethod
+    def get_queryset():
+        return Post.objects.all() \
+            .select_related("user") \
+            .annotate(Count("comments")) \
+            .values("id", "title", "created", "user__username", "comments__count") \
+            .order_by("-comments__count")
+        # .filter(comments__created__gte=(datetime.now() - timedelta(hours=12))) \
+
+    def get(self, request):
+        posts = self.get_queryset()
+        return render(request, "todolist/top_posts.html", {"posts": posts})
