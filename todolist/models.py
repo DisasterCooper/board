@@ -25,3 +25,9 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ["created"]
+
+    def __str__(self):
+        return self.content
+
+    # def __repr__(self):
+    #     return f"{self.username}"

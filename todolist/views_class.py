@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+
+from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404, reverse
 from django.http import HttpResponseNotAllowed, Http404, HttpResponseForbidden
 from django.urls import reverse_lazy
@@ -7,6 +10,8 @@ from django.utils.decorators import method_decorator
 from django.db.models import Count, Avg, Min, Max
 
 from .models import Post, Comment
+from .forms import PostForm
+from user.models import User as usermodel
 
 
 class PostsList(generic.View):
@@ -15,13 +20,13 @@ class PostsList(generic.View):
     def get_queryset():
         """
         Формирует 'QuerySet' всех заметок и возвращает поля id, title, created,
-        имя пользователя, создавшего заметку и комментарии к ней.
+        имя пользователя, создавшего заметку и количество комментариев к этой заметке.
         :return: Если values => возвращается 'QuerySet' словарей!
         """
-        return Post.objects.all()\
-            .select_related("user")\
-            .annotate(Count("comments"))\
-            .values("id", "title", "created", "user__username", "comments__count")\
+        return Post.objects.all() \
+            .select_related("user") \
+            .annotate(Count("comments")) \
+            .values("id", "title", "created", "user__username", "comments__count") \
             .order_by("-comments__count")
 
     def get(self, request):
@@ -92,20 +97,26 @@ class CreatePost(generic.View):
     validator = PostValidate
 
     def get(self, request):
-        return render(request, "todolist/create_post.html")
+        form = PostForm(initial={"title": "Add title here"})
+        return render(request, "todolist/create_post.html", {"form": form})
 
     def post(self, request):
-        validator = self.validator(title=request.POST.get("title", ""), content=request.POST.get("content", ""))
+        form = PostForm(request.POST)  # Create form for users data
 
-        if not validator.is_valid():
-            return render(request, "todolist/create_post.html", {"validator": validator})
+        if not form.is_valid():  # Проверка данных пользователя
+            return render(request, "todolist/create_post.html", {"form": form})
 
-        post = self.model.objects.create(
-            title=validator.title["value"],
-            content=validator.content["value"],
-            user=request.user
-        )
-        # post.save()
+        with transaction.atomic():
+            # После валидации обязательно получаем очищенные данные
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+
+            post = self.model.objects.create(
+                title=title,
+                content=content,
+                user=request.user
+            )
+            post.save()
         return redirect(reverse("posts:show", kwargs={"post_id": post.id}))
 
 
@@ -123,19 +134,27 @@ class EditPost(generic.View):
         if not self.has_user_permission(post):
             return HttpResponseForbidden()
 
-        validator = self.validator(post.title, post.content)
-        return render(request, "todolist/edit_post.html", {"validator": validator})
+        form = PostForm(instance=Post.objects.get(id=post_id))
+        return render(request, "todolist/edit_post.html", {"form": form})
 
     def post(self, request, post_id: int):
         post = get_object_or_404(self.model, id=post_id)
+        form = PostForm(request.POST)
 
-        validator = self.validator(title=request.POST.get("title", ""), content=request.POST.get("content", ""))
-        post.title = validator.title["value"]
-        post.content = validator.content["value"]
-        if not validator.is_valid():
-            return render(request, "todolist/edit_post.html", {"post": post})
+        if not form.is_valid():
+            return render(request, "todolist/edit_post.html", {"form": form})
 
-        post.save()
+        with transaction.atomic():
+            title = form.cleaned_data["title"]
+            content = form.cleaned_data["content"]
+            print(title)
+
+            post.title = title,
+            post.content = content
+
+            print(request.POST.get.title)
+
+            post.save()
         return redirect(reverse("posts:show", kwargs={"post_id": post_id}))
 
 
@@ -144,46 +163,52 @@ class ShowPost(generic.DetailView):
     pk_url_kwarg = "post_id"  # Где взять id объекта в URL?
     template_name = "todolist/show_post.html"  # Шаблон, куда вернуть
     context_object_name = "post"  # Под каким именем вернуть в этот шаблон
+    image = "img/img.png"  # !! Добавить для TODOLIST фоновую картинку (или удалить строку эту)
 
 
 @method_decorator(login_required, name="dispatch")
-class DeletePost(generic.View):
+class DeletePost(generic.DeleteView):
     model = Post
     queryset = Post.objects
     pk_url_kwarg = "post_id"
-    success_url = reverse_lazy("home")
+    success_url = reverse_lazy("posts: home")
 
-    def get_obj_pk(self):
-        # для того чтобы из url '<int:post_id>/delete/' вытянуть значение, в данном случае post_id
-        return self.kwargs[self.pk_url_kwarg]
-
-    def get_queryset(self):
-        return self.queryset
-
-    def has_user_permission(self, post: Post) -> bool:
-        return post.user.id == self.request.user.id
-
-    def get_success_url(self):
-        return self.success_url
-
-    def post(self, request):
-        qs = self.get_queryset()
-        pk = self.get_obj_pk()
-        try:
-            obj_ = qs.get(id=pk)
-        except self.model.DoesNotExist:
-            raise Http404()
-
-        if self.has_user_permission(obj_):
-            obj_.delete()
-            return redirect(self.get_success_url())
-
-        else:
+    def form_valid(self, form):
+        if self.object.user != self.request.user:
             return HttpResponseForbidden()
-
-    # Проверку на ошибки используя try можно заменить, используя qs.filter для метода post.
-    # Минус - заметка сразу удалится, без просмотра
-    # qs.filter(pk=pk).delete()
+        return super().form_valid(form)
+    #
+    # def get_obj_pk(self):
+    #     # для того чтобы из url '<int:post_id>/delete/' вытянуть значение, в данном случае post_id
+    #     return self.kwargs[self.pk_url_kwarg]
+    #
+    # def get_queryset(self):
+    #     return self.queryset
+    #
+    # def has_user_permission(self, post: Post) -> bool:
+    #     return post.user.id == self.request.user.id
+    #
+    # def get_success_url(self):
+    #     return self.success_url
+    #
+    # def post(self, request):
+    #     qs = self.get_queryset()
+    #     pk = self.get_obj_pk()
+    #     try:
+    #         obj_ = qs.get(id=pk)
+    #     except self.model.DoesNotExist:
+    #         raise Http404()
+    #
+    #     if self.has_user_permission(obj_):
+    #         obj_.delete()
+    #         return redirect(self.get_success_url())
+    #
+    #     else:
+    #         return HttpResponseForbidden()
+    #
+    # # Проверку на ошибки используя try можно заменить, используя qs.filter для метода post.
+    # # Минус - заметка сразу удалится, без просмотра
+    # # qs.filter(pk=pk).delete()
 
 
 class CommentAdd(generic.View):
@@ -202,3 +227,39 @@ class CommentAdd(generic.View):
             post=post,
         )
         return redirect(reverse("posts:show", kwargs={"post_id": post.id}))
+
+
+class ProfileUsers(generic.View):
+
+    @staticmethod
+    def get_queryset():
+        return Post.objects.all() \
+            .select_related("user") \
+            .annotate(
+                comments__count=Count("comments", distinct=True),
+                comments__created=Max("comments__created"),
+                )\
+            .values("id", "title", "created", "user__username", "comments__count", "comments__created") \
+            .order_by("-comments__count")
+
+    def get(self, request):
+        posts = self.get_queryset()
+        return render(request, "todolist/profile_users.html", {"posts": posts})
+
+
+class TopPosts(generic.View):
+
+    @staticmethod
+    def get_queryset():
+        return Post.objects.all() \
+            .select_related("user", "todolist_comment") \
+            .filter(comments__created__gte=(datetime.now() - timedelta(hours=12))) \
+            .annotate(
+                comments__count=Count("comments", distinct=True),
+                ) \
+            .values("id", "title", "created", "user__username", "comments__count") \
+            .order_by("-comments__count")
+
+    def get(self, request):
+        posts = self.get_queryset()
+        return render(request, "todolist/top_posts.html", {"posts": posts})

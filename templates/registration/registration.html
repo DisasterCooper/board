@@ -1,17 +1,18 @@
-{% extends "todolist/base_todolist.html" %}
-
+{% extends 'todolist/base_todolist.html' %}
 {% load crispy_forms_tags %}
+{% load avatar_tags %}
 
     {% block content %}
         <div class="container w-50">
-            <form method="post">
+            <h2>Registration</h2>
 
+            <form method="post">
                 {% csrf_token %}
 
                 {{ form | crispy  }}
 
-                <button type="submit" class="btn btn-warning">Send</button>
-
+              <button type="submit" class="btn btn-primary">Submit</button>
             </form>
         </div>
+
     {% endblock %}
