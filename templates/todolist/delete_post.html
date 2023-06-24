@@ -1,21 +1,18 @@
-{% extends "todolist/base_todolist.html" %}
+{% extends 'todolist/base_todolist.html' %}
+
+{% load crispy_forms_tags %}
 
 {% block content %}
-<div>
+    <div class="container w-50">
+      <h3>Delete Post</h3>
 
-    <form method="post">
+      <form method="post">
+          {% csrf_token %}
 
-        {% csrf_token %}
+        <p>Are you sure you want to delete "{{ post.title }}"?</p>
 
-        <p class="danger-block">Delete "{{ post.title }}"?</p>
-
-        <div>
-        <a href="{% url "posts:delete" post.id %}">
-        <button type="submit">Delete</button>
-        </a>
-        </div>
-
-    </form>
-
-</div>
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'posts:show' post.id %}" class="btn btn-secondary">Cancel</a>
+      </form>
+    </div>
 {% endblock %}
