@@ -5,22 +5,26 @@
         <div class="d-flex justify-content-center py-3">
             <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
                 <li><a href="{% url 'posts:home' %}" class="nav-link px-2">Home</a></li>
-                <li><a class="btn btn-success bs-tooltip-bottom" href="{% url 'redact_user' %}">Profile</a></li>
                 <li><a class="btn btn-warning" href="{% url 'posts:users' %}" >Users</a></li>
                 <li><a class="btn btn-warning" href="{% url 'posts:top_posts' %}" >Top-Posts</a></li>
 
                 {% if request.user.is_authenticated %}
 
-                         <li><a class="btn btn-outline-primary" href="{% url 'accounts:logout'%}">Sign-out</a></li>
-                     {% else %}
-                         <a href="{% url 'accounts:login'%}">
-                             <button type="button" class="btn btn-primary me-2">Login</button>
-                         </a>
-                         <a href="{% url 'registration' %}">
-                             <button type="button" class="btn btn-outline-primary">Registration</button>
-                         </a>
-                     {% endif %}
-                </ul>
+                    <li><a class="btn btn-success bs-tooltip-bottom"href="{% url 'user:redact_user' user_id=user.id %}">
+                        Profile</a></li>
+                    <li><a class="btn btn-outline-primary" href="{% url 'accounts:logout'%}">
+                        Sign-out</a></li>
+
+                 {% else %}
+
+                     <a href="{% url 'accounts:login'%}">
+                         <button type="button" class="btn btn-primary me-2">Login</button>
+                     </a>
+                     <a href="{% url 'registration' %}">
+                         <button type="button" class="btn btn-outline-primary">Registration</button>
+                     </a>
+             {% endif %}
+            </ul>
         </div>
     </div>
 </header>

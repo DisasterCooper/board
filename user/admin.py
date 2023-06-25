@@ -12,5 +12,5 @@ class UserAdmin(DefaultUserAdmin):
         "first_name",
         "last_name",
         "is_staff",
-        "avatar",
+        "avatar_image",
     ]

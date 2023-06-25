@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.views import View
+from django.views import View, generic
 
-from .forms import UserRegisterForm, UserChangeForm
+from .forms import UserRegisterForm, UserRedactForm
 from .models import User
 
 
@@ -18,25 +18,11 @@ class Registration(View):
             return render(request, "registration/registration.html", {"form": form})
 
         form.save()
-        return redirect("accounts: login")
+        return redirect("accounts:login")
 
 
-class ShowUser(View):
-    pass
-
-
-class RedactUser(View):
+class RedactUser(generic.UpdateView):
     model = User
-
-    def get(self, request):
-        user = request.user
-        return render(request, "user/redact_user.html", {"user_form": UserChangeForm()})
-
-    def post(self, request):
-        form = UserRegisterForm(request.POST)
-
-        if not form.is_valid():
-            return render(request, "registration/registration.html", {"form": form})
-
-        form.save()
-        return redirect("accounts: login")
+    form_class = UserRedactForm
+    pk_url_kwarg = "user_id"
+    template_name = "user/redact_user.html"
