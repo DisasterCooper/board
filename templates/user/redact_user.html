@@ -1,5 +1,5 @@
 {% extends "todolist/base_todolist.html" %}
-
+{% load avatar_tags %}
 {% load crispy_forms_tags %}
 
     {% block content %}
@@ -9,9 +9,9 @@
                 {% csrf_token %}
 
 
-                {{ user_form | crispy }}
+                {{ form | crispy }}
 
                 <button type="submit" class="btn btn-warning">Send</button>>
             </form>
-         </div>
+        </div>
     {% endblock %}

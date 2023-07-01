@@ -121,41 +121,11 @@ class CreatePost(generic.View):
 
 
 @method_decorator(login_required, name="dispatch")
-class EditPost(generic.View):
+class EditPost(generic.UpdateView):
     model = Post
-    validator = PostValidate
-
-    def has_user_permission(self, post: Post) -> bool:
-        return post.user.id == self.request.user.id
-
-    def get(self, request, post_id: int):
-        post = get_object_or_404(self.model, id=post_id)
-
-        if not self.has_user_permission(post):
-            return HttpResponseForbidden()
-
-        form = PostForm(instance=Post.objects.get(id=post_id))
-        return render(request, "todolist/edit_post.html", {"form": form})
-
-    def post(self, request, post_id: int):
-        post = get_object_or_404(self.model, id=post_id)
-        form = PostForm(request.POST)
-
-        if not form.is_valid():
-            return render(request, "todolist/edit_post.html", {"form": form})
-
-        with transaction.atomic():
-            title = form.cleaned_data["title"]
-            content = form.cleaned_data["content"]
-            print(title)
-
-            post.title = title,
-            post.content = content
-
-            print(request.POST.get.title)
-
-            post.save()
-        return redirect(reverse("posts:show", kwargs={"post_id": post_id}))
+    form_class = PostForm
+    pk_url_kwarg = "post_id"
+    template_name = "todolist/edit_post.html"
 
 
 class ShowPost(generic.DetailView):
@@ -171,44 +141,13 @@ class DeletePost(generic.DeleteView):
     model = Post
     queryset = Post.objects
     pk_url_kwarg = "post_id"
-    success_url = reverse_lazy("posts: home")
+    success_url = reverse_lazy("posts:home")
+    template_name = "todolist/delete_post.html"
 
     def form_valid(self, form):
         if self.object.user != self.request.user:
             return HttpResponseForbidden()
         return super().form_valid(form)
-    #
-    # def get_obj_pk(self):
-    #     # для того чтобы из url '<int:post_id>/delete/' вытянуть значение, в данном случае post_id
-    #     return self.kwargs[self.pk_url_kwarg]
-    #
-    # def get_queryset(self):
-    #     return self.queryset
-    #
-    # def has_user_permission(self, post: Post) -> bool:
-    #     return post.user.id == self.request.user.id
-    #
-    # def get_success_url(self):
-    #     return self.success_url
-    #
-    # def post(self, request):
-    #     qs = self.get_queryset()
-    #     pk = self.get_obj_pk()
-    #     try:
-    #         obj_ = qs.get(id=pk)
-    #     except self.model.DoesNotExist:
-    #         raise Http404()
-    #
-    #     if self.has_user_permission(obj_):
-    #         obj_.delete()
-    #         return redirect(self.get_success_url())
-    #
-    #     else:
-    #         return HttpResponseForbidden()
-    #
-    # # Проверку на ошибки используя try можно заменить, используя qs.filter для метода post.
-    # # Минус - заметка сразу удалится, без просмотра
-    # # qs.filter(pk=pk).delete()
 
 
 class CommentAdd(generic.View):

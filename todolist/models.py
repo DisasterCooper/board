@@ -1,4 +1,5 @@
 from django.db import models
+from django.shortcuts import reverse
 
 
 class Post(models.Model):
@@ -14,6 +15,9 @@ class Post(models.Model):
     @property
     def comments_count(self) -> int:
         return self.comments.all().count()
+
+    def get_absolute_url(self):
+        return reverse("posts:show", kwargs={"post_id": self.id})
 
 
 class Comment(models.Model):
